@@ -1,0 +1,145 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+
+    <header>
+        <h1>encrypt</h1>
+    </header>
+    <main>
+        <form>
+            <label for="textfield">input</label>
+            <input type="text" id="textfield">
+            <label for="seedvalue">seed</label>
+            <input type="text" id="seedvalue">
+            <button class="encryptButton">encrypt</button>
+        </form>
+        <p class="output">output</p>
+        <p class="encryptedOutput">encrypted</p>
+    </main>
+    <footer>
+        <p>july2022</p>
+    </footer>
+    
+<script>
+    app = {}
+
+    app.decryptText = function(strEncrypted, jSeed){
+        const prime1 = 13;
+        const prime2 = 17;
+        const prime3 = 7;
+        const encryptionVal = (prime1 * prime2);
+        const decryptionVal = 55;        
+        const arrEncrypted = strEncrypted.split(";");
+        let arrOutput = [];
+
+        let collatzSeed = jSeed;
+        let currentNum = collatzSeed;
+        
+        const runDecryptMath = function(iEncrypted){
+            if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
+                collatzSeed = collatzSeed + 1;
+                currentNum = collatzSeed;
+            } else {
+                if ((currentNum % 2) == 0){
+                    currentNum = (currentNum / 2);
+                } else {
+                    currentNum = ((currentNum * 3) + 1);
+                };
+            }
+
+            let biicurrentNum = BigInt(currentNum)
+            let biiEncrypted = BigInt(iEncrypted);
+            let biDecryptionVal = BigInt(decryptionVal);
+            let biEncryptionVal = BigInt(encryptionVal);
+            let biResult = BigInt((biiEncrypted-biicurrentNum)**biDecryptionVal)%biEncryptionVal;
+            let result = String.fromCharCode(Number(biResult));
+            return result;
+        }
+        
+        arrEncrypted.forEach(function(value){
+            const chLetter = runDecryptMath(value);
+            arrOutput.push(chLetter);
+        });
+
+        const strOutput = arrOutput.join("");
+        return strOutput;
+
+        // app.decryptText("165;109;86;88;22;69;14;35;83;86;185;106", 5);
+    }
+    
+
+    app.encryptText = function(strToEncrypt, iSeed){
+        const prime1 = 13;
+        const prime2 = 17;
+        const prime3 = 7;
+        const encryptionVal = (prime1 * prime2);
+        const decryptionVal = 55;
+        // 13*17 = 221, 220 possible values, works with most ASCII chars set to unicode
+        const arrStrToEncrypt = strToEncrypt.split("");
+        let arrOutput = [];
+        
+        let collatzSeed = iSeed;
+        let currentNum = collatzSeed;
+
+        const runEncryptMath = function(iLetter){
+            if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
+                collatzSeed = collatzSeed + 1;
+                currentNum = collatzSeed;
+            } else {
+                if ((currentNum % 2) == 0){
+                    currentNum = (currentNum / 2);
+                } else {
+                    currentNum = ((currentNum * 3) + 1);
+                };
+            }
+            const result = (((iLetter**prime3)%encryptionVal) + currentNum);
+            return result;
+        }     
+
+        arrStrToEncrypt.forEach(function(letter){
+            const letterUnicode = letter.charCodeAt(0);
+            const encryptedVal = runEncryptMath(letterUnicode);
+            arrOutput.push(encryptedVal);
+        });        
+
+        const strOutput = arrOutput.join(";");
+
+        return strOutput;
+    }
+
+    app.init = function(){
+        const textFieldTextToEncrypt = document.getElementById("textfield");
+        const buttonEncrypt = document.querySelector(".encryptButton");
+        const pOutput = document.querySelector(".output");
+        const pEncOutput = document.querySelector(".encryptedOutput");
+        const textFieldSeed = document.getElementById("seedvalue");
+        
+        buttonEncrypt.addEventListener('click', function(e){
+            e.preventDefault();
+            let strToEncrypt = textFieldTextToEncrypt.value;
+            let seedValue = textFieldSeed.value;
+            seedValue = Number(seedValue);
+            let strEncrypted = app.encryptText(strToEncrypt, seedValue);
+            // let strEncrypted = app.encryptText("Hey Rob Mason", 11);
+
+            pOutput.innerText = strToEncrypt;
+            pEncOutput.innerText = strEncrypted;
+            textFieldTextToEncrypt.value="";
+            textFieldTextToEncrypt.innerText="";
+            textFieldSeed.value = "";
+            textFieldSeed.innerText = "";
+        });
+    }
+
+    app.init();
+
+
+</script>
+</body>
+</html>
