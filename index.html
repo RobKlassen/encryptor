@@ -54,27 +54,16 @@
         const decryptionVal = 55;        
         const arrEncrypted = strEncrypted.split(";");
         let arrOutput = [];
-
-        let collatzSeed = jSeed;
-        let currentNum = collatzSeed;
-        
+     
         const runDecryptMath = function(iEncrypted){
-            if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
-                collatzSeed = collatzSeed + 1;
-                currentNum = collatzSeed;
-            } else {
-                if ((currentNum % 2) == 0){
-                    currentNum = (currentNum / 2);
-                } else {
-                    currentNum = ((currentNum * 3) + 1);
-                };
-            }
 
-            let biicurrentNum = BigInt(currentNum)
+            jSeed = app.getCollatzNumber(jSeed)
+
+            let biJSeed = BigInt(jSeed)
             let biiEncrypted = BigInt(iEncrypted);
             let biDecryptionVal = BigInt(decryptionVal);
             let biEncryptionVal = BigInt(encryptionVal);
-            let biResult = BigInt((biiEncrypted-biicurrentNum)**biDecryptionVal)%biEncryptionVal;
+            let biResult = BigInt((biiEncrypted-biJSeed)**biDecryptionVal)%biEncryptionVal;
             let result = String.fromCharCode(Number(biResult));
             return result;
         }
@@ -109,7 +98,7 @@
 
         arrStrToEncrypt.forEach(function(letter){
             const letterUnicode = letter.charCodeAt(0);
-            const encryptedVal = runEncryptMath(letterUnicode);
+            const encryptedVal = runEncryptMath(letterUnicode, 0);
             arrOutput.push(encryptedVal);
         });        
 
@@ -148,7 +137,7 @@
     }
 
     app.init();
-    
+
 </script>
 </body>
 </html>
