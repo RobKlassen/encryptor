@@ -23,56 +23,60 @@
         <p class="encryptedOutput">encrypted</p>
     </main>
     <footer>
-        <p>july2022</p>
+        <p class="tempOutput">july2022</p>
     </footer>
     
 <script>
     app = {}
 
-    // app.decryptText = function(strEncrypted, jSeed){
-    //     const prime1 = 13;
-    //     const prime2 = 17;
-    //     const prime3 = 7;
-    //     const encryptionVal = (prime1 * prime2);
-    //     const decryptionVal = 55;        
-    //     const arrEncrypted = strEncrypted.split(";");
-    //     let arrOutput = [];
+    app.getCollatzNumber = function(collatzSeed){
+        let currentNum = collatzSeed;
 
-    //     let collatzSeed = jSeed;
-    //     let currentNum = collatzSeed;
+        if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
+                collatzSeed = collatzSeed + 1;
+                currentNum = collatzSeed;
+            } else {
+                if ((currentNum % 2) == 0){
+                    currentNum = (currentNum / 2);
+                } else {
+                    currentNum = ((currentNum * 3) + 1);
+                };
+        }
+        return currentNum;
+    }
+
+
+    app.decryptText = function(strEncrypted, jSeed){
+        const prime1 = 13;
+        const prime2 = 17;
+        const prime3 = 7;
+        const encryptionVal = (prime1 * prime2);
+        const decryptionVal = 55;        
+        const arrEncrypted = strEncrypted.split(";");
+        let arrOutput = [];
+
+        const runDecryptMath = function(iEncrypted){
+
+            jSeed = app.getCollatzNumber(jSeed);
+            let biJSeed = BigInt(jSeed);
+
+            let biiEncrypted = BigInt(iEncrypted);
+            let biDecryptionVal = BigInt(decryptionVal);
+            let biEncryptionVal = BigInt(encryptionVal);
+            let biResult = BigInt((biiEncrypted - biJSeed)**biDecryptionVal)%biEncryptionVal;
+            let result = String.fromCharCode(Number(biResult));
+            return result;
+        }
         
-    //     const runDecryptMath = function(iEncrypted){
-    //         if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
-    //             collatzSeed = collatzSeed + 1;
-    //             currentNum = collatzSeed;
-    //         } else {
-    //             if ((currentNum % 2) == 0){
-    //                 currentNum = (currentNum / 2);
-    //             } else {
-    //                 currentNum = ((currentNum * 3) + 1);
-    //             };
-    //         }
+        arrEncrypted.forEach(function(value){
+            const chLetter = runDecryptMath(value);
+            arrOutput.push(chLetter);
+        });
 
-    //         let biicurrentNum = BigInt(currentNum)
-    //         let biiEncrypted = BigInt(iEncrypted);
-    //         let biDecryptionVal = BigInt(decryptionVal);
-    //         let biEncryptionVal = BigInt(encryptionVal);
-    //         let biResult = BigInt((biiEncrypted-biicurrentNum)**biDecryptionVal)%biEncryptionVal;
-    //         let result = String.fromCharCode(Number(biResult));
-    //         return result;
-    //     }
-        
-    //     arrEncrypted.forEach(function(value){
-    //         const chLetter = runDecryptMath(value);
-    //         arrOutput.push(chLetter);
-    //     });
+        const strOutput = arrOutput.join("");
+        return strOutput;
+    }
 
-    //     const strOutput = arrOutput.join("");
-    //     return strOutput;
-
-    //     // app.decryptText("165;109;86;88;22;69;14;35;83;86;185;106", 5);
-    // }
-    
 
     app.encryptText = function(strToEncrypt, iSeed){
         const prime1 = 13;
@@ -83,27 +87,16 @@
         // 13*17 = 221, 220 possible values, works with most ASCII chars set to unicode
         const arrStrToEncrypt = strToEncrypt.split("");
         let arrOutput = [];
-        
-        let collatzSeed = iSeed;
-        let currentNum = collatzSeed;
 
         const runEncryptMath = function(iLetter){
-            if ((currentNum == 4) || (currentNum == 2) || (currentNum == 1) || (currentNum == 0)){
-                collatzSeed = collatzSeed + 1;
-                currentNum = collatzSeed;
-            } else {
-                if ((currentNum % 2) == 0){
-                    currentNum = (currentNum / 2);
-                } else {
-                    currentNum = ((currentNum * 3) + 1);
-                };
-            }
-            const result = (((iLetter**prime3)%encryptionVal) + currentNum);
+            iSeed = app.getCollatzNumber(iSeed);
+            const result = ((((iLetter**prime3) + iSeed)%encryptionVal));
             return result;
         }     
 
         arrStrToEncrypt.forEach(function(letter){
             const letterUnicode = letter.charCodeAt(0);
+            console.log(letterUnicode);
             const encryptedVal = runEncryptMath(letterUnicode);
             arrOutput.push(encryptedVal);
         });        
@@ -119,6 +112,8 @@
         const pOutput = document.querySelector(".output");
         const pEncOutput = document.querySelector(".encryptedOutput");
         const textFieldSeed = document.getElementById("seedvalue");
+
+                    const tempOutput = document.querySelector(".tempOutput")
         
         buttonEncrypt.addEventListener('click', function(e){
             e.preventDefault();
@@ -126,7 +121,6 @@
             let seedValue = textFieldSeed.value;
             seedValue = Number(seedValue);
             let strEncrypted = app.encryptText(strToEncrypt, seedValue);
-            // let strEncrypted = app.encryptText("Hey Rob Mason", 11);
 
             pOutput.innerText = strToEncrypt;
             pEncOutput.innerText = strEncrypted;
@@ -134,11 +128,14 @@
             textFieldTextToEncrypt.innerText="";
             textFieldSeed.value = "";
             textFieldSeed.innerText = "";
+
+
+                    const decryptedVal = app.decryptText(strEncrypted, seedValue);
+                    tempOutput.innerText = decryptedVal;
         });
     }
 
     app.init();
-
 
 </script>
 </body>
